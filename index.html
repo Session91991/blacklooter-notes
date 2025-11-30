@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BlackLooterX Notes Vault</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    min-height:100vh;
+    background:#020008;
+    color:#f72585;
+    font-family:'Share Tech Mono',monospace;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    overflow:hidden;
+}
+
+/* Animated background glow */
+body::before{
+    content:"";
+    position:fixed;
+    inset:-50%;
+    background:
+      radial-gradient(circle at 10% 20%,rgba(247,37,133,.35),transparent 50%),
+      radial-gradient(circle at 80% 0%,rgba(111,0,255,.35),transparent 55%),
+      radial-gradient(circle at 50% 100%,rgba(255,0,0,.35),transparent 55%);
+    filter:blur(10px);
+    opacity:.5;
+    animation:bgMove 12s linear infinite alternate;
+    z-index:-2;
+}
+@keyframes bgMove{
+    from{transform:translate3d(-20px,-10px,0);}
+    to{transform:translate3d(20px,10px,0);}
+}
+
+/* Glass card */
+.app{
+    width:100%;
+    max-width:900px;
+    background:rgba(4,0,15,0.9);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:18px;
+    padding:18px 16px 20px;
+    box-shadow:0 0 25px rgba(0,0,0,0.9),0 0 35px rgba(247,37,133,0.35);
+    position:relative;
+    overflow:hidden;
+}
+
+.app::before{
+    content:"";
+    position:absolute;
+    top:-40%;
+    right:-40%;
+    width:60%;
+    height:60%;
+    background:conic-gradient(from 0deg,rgba(247,37,133,.6),rgba(111,0,255,.6),rgba(0,0,0,0));
+    filter:blur(40px);
+    opacity:.3;
+    animation:ringSpin 14s linear infinite;
+    z-index:-1;
+}
+@keyframes ringSpin{
+    from{transform:rotate(0deg);}
+    to{transform:rotate(360deg);}
+}
+
+/* Header */
+.header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:16px;
+}
+.title{
+    font-size:1.2rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:#fff;
+    text-shadow:0 0 12px #f72585,0 0 24px #7209b7;
+}
+.tagline{
+    font-size:.7rem;
+    color:#f1f1f1;
+    opacity:.7;
+}
+
+/* Tabs */
+.tabs{
+    display:flex;
+    margin-bottom:12px;
+    border-radius:999px;
+    padding:3px;
+    background:rgba(255,255,255,0.03);
+}
+.tab-btn{
+    flex:1;
+    border:none;
+    background:transparent;
+    color:#d1d1d1;
+    padding:7px 0;
+    border-radius:999px;
+    font-size:.8rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    transition:.2s;
+}
+.tab-btn.active{
+    background:linear-gradient(90deg,#f72585,#b5179e,#7209b7);
+    color:#fff;
+    box-shadow:0 0 14px rgba(247,37,133,0.7);
+}
+
+/* Panels */
+.panel{
+    display:none;
+}
+.panel.active{
+    display:block;
+}
+
+/* Textarea & notes box */
+textarea{
+    width:100%;
+    min-height:220px;
+    background:rgba(2,0,20,0.95);
+    border:1px solid rgba(247,37,133,0.5);
+    border-radius:12px;
+    padding:12px;
+    resize:vertical;
+    color:#38f9a5;
+    font-size:.9rem;
+    line-height:1.4;
+    outline:none;
+    box-shadow:inset 0 0 18px rgba(0,0,0,0.9);
+    caret-color:#f72585;
+}
+
+textarea:focus{
+    border-color:#fbff00;
+    box-shadow:0 0 14px rgba(251,255,0,0.6),inset 0 0 18px rgba(0,0,0,0.9);
+}
+
+/* Buttons */
+.btn-row{
+    margin-top:10px;
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+}
+.button{
+    border:none;
+    border-radius:999px;
+    padding:9px 20px;
+    font-size:.8rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    cursor:pointer;
+    background:linear-gradient(120deg,#f72585,#b5179e,#7209b7);
+    color:#fff;
+    box-shadow:0 0 16px rgba(247,37,133,0.6);
+    position:relative;
+    overflow:hidden;
+    transition:.18s;
+}
+.button::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-60%;
+    width:40%;
+    height:100%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.8),transparent);
+    transform:skewX(-20deg);
+    opacity:0;
+}
+.button:hover{
+    transform:translateY(-1px) scale(1.02);
+    box-shadow:0 0 24px rgba(247,37,133,0.8);
+}
+.button:active{
+    transform:translateY(0) scale(.98);
+    box-shadow:0 0 12px rgba(247,37,133,0.5);
+}
+.button.glow::after{
+    animation:shine 1.1s linear;
+}
+@keyframes shine{
+    from{left:-60%;opacity:0;}
+    30%{opacity:1;}
+    to{left:120%;opacity:0;}
+}
+
+/* Status / log */
+.status{
+    margin-top:8px;
+    font-size:.75rem;
+    text-align:left;
+    color:#f1f1f1;
+}
+.status span.ok{color:#4cffc3;}
+.status span.err{color:#ff4b91;}
+.status .small{
+    font-size:.7rem;
+    opacity:.75;
+}
+
+/* View panel */
+.notes-box{
+    margin-top:6px;
+    width:100%;
+    max-height:260px;
+    overflow:auto;
+    background:rgba(3,0,25,0.96);
+    border-radius:10px;
+    border:1px solid rgba(114,9,183,0.7);
+    padding:10px;
+    color:#e0e0ff;
+    font-size:.78rem;
+    line-height:1.4;
+    white-space:pre-wrap;
+    box-shadow:inset 0 0 16px rgba(0,0,0,0.9);
+}
+
+/* Scrollbar */
+.notes-box::-webkit-scrollbar{
+    width:6px;
+}
+.notes-box::-webkit-scrollbar-thumb{
+    background:linear-gradient(#f72585,#7209b7);
+    border-radius:999px;
+}
+.notes-box::-webkit-scrollbar-track{
+    background:transparent;
+}
+
+/* Footer */
+.footer{
+    margin-top:10px;
+    font-size:.7rem;
+    text-align:right;
+    color:#bbbbbb;
+    opacity:.8;
+}
+.footer span{
+    color:#f72585;
+}
+@media(max-width:600px){
+    .app{padding:14px 10px 16px;}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+    <div class="header">
+        <div>
+            <div class="title">🩸 BLACKLOOTERX NOTES VAULT 😈</div>
+            <div class="tagline">FREE • DEVIL • PERSISTENT NOTES STORED IN VERCEL KV</div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="write">WRITE NOTE</button>
+        <button class="tab-btn" data-tab="view">VIEW NOTES</button>
+    </div>
+
+    <!-- WRITE PANEL -->
+    <div id="panel-write" class="panel active">
+        <textarea id="noteInput" placeholder="Type your dark note here... It will be appended in Vercel KV."></textarea>
+        <div class="btn-row">
+            <button class="button" id="saveBtn">Save</button>
+        </div>
+        <div class="status" id="writeStatus"></div>
+    </div>
+
+    <!-- VIEW PANEL -->
+    <div id="panel-view" class="panel">
+        <div class="btn-row" style="justify-content:space-between; margin-top:0;">
+            <div style="text-align:left;font-size:.75rem;color:#f1f1f1;opacity:.8;">
+                Notes are loaded from <span style="color:#fbff00;">Vercel KV</span>.
+            </div>
+            <button class="button" id="refreshBtn" style="padding:8px 16px;">Refresh</button>
+        </div>
+        <div class="notes-box" id="notesBox">
+            No notes loaded yet. Tap REFRESH.
+        </div>
+        <div class="status" id="viewStatus"></div>
+    </div>
+
+    <div class="footer">
+        𝑩𝒍𝒂𝒄𝒌𝑳𝒐𝒐𝒕𝒆𝒓𝑿 <span>🩸</span> • Powered by Vercel KV
+    </div>
+</div>
+
+<script>
+const saveBtn    = document.getElementById("saveBtn");
+const refreshBtn = document.getElementById("refreshBtn");
+const noteInput  = document.getElementById("noteInput");
+const writeStatus= document.getElementById("writeStatus");
+const viewStatus = document.getElementById("viewStatus");
+const notesBox   = document.getElementById("notesBox");
+
+// Tab switching
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+        document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        const tab = btn.dataset.tab;
+        document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+        document.getElementById("panel-"+tab).classList.add("active");
+        if(tab==="view"){ loadNotes(); }
+    });
+});
+
+function flashButton(el){
+    el.classList.remove("glow");
+    void el.offsetWidth;
+    el.classList.add("glow");
+}
+
+// ---- SAVE ----
+async function saveNote(){
+    const text = noteInput.value.trim();
+    if(!text){
+        writeStatus.innerHTML = '<span class="err">Nothing to save.</span>';
+        return;
+    }
+
+    saveBtn.disabled = true;
+    flashButton(saveBtn);
+    writeStatus.innerHTML = '<span class="small">Saving…</span>';
+
+    try{
+        const res = await fetch("/api/save-note", {
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body: JSON.stringify({ text })
+        });
+
+        const data = await res.json();
+
+        if(data.ok){
+            writeStatus.innerHTML = '<span class="ok">Saved successfully.</span>';
+            noteInput.value = "";
+            loadNotes(true);
+        }else{
+            writeStatus.innerHTML = '<span class="err">'+(data.error || "Error")+'</span>';
+        }
+    }catch(e){
+        writeStatus.innerHTML = '<span class="err">Network error.</span>';
+    }finally{
+        saveBtn.disabled = false;
+    }
+}
+
+// ---- LOAD ----
+async function loadNotes(fromSave=false){
+    viewStatus.innerHTML = fromSave ? '' : '<span class="small">Loading notes…</span>';
+    refreshBtn.disabled = true;
+    flashButton(refreshBtn);
+
+    try{
+        const res = await fetch("/api/get-notes");
+        const data = await res.json();
+
+        if(data.ok){
+            if(!data.notes.length){
+                notesBox.textContent = "No notes yet. Save something first.";
+            }else{
+                const lines = data.notes.map(n => {
+                    return "───── ["+n.ts+"] ─────\n" + n.text;
+                }).join("\n\n");
+                notesBox.textContent = lines;
+            }
+            viewStatus.innerHTML = '<span class="ok">Loaded ✔</span>';
+        }else{
+            viewStatus.innerHTML = '<span class="err">'+(data.error || "Error")+'</span>';
+        }
+    }catch(e){
+        viewStatus.innerHTML = '<span class="err">Network error.</span>';
+    }finally{
+        refreshBtn.disabled = false;
+    }
+}
+
+saveBtn.addEventListener("click", saveNote);
+refreshBtn.addEventListener("click", ()=>loadNotes(false));
+</script>
+</body>
+</html>
